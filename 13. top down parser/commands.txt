@@ -1,0 +1,3 @@
+bison -d exp13.y
+gcc exp13.tab.c -o exp13.exe
+exp13.exe

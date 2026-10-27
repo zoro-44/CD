@@ -1,0 +1,3 @@
+flex exp8.l
+gcc lex.yy.c -o exp8.exe
+exp8.exe

@@ -1,0 +1,4 @@
+bison -dy exp5.y
+flex exp5.l
+gcc y.tab.c lex.yy.c -o exp5
+exp5.exe

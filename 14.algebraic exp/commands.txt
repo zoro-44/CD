@@ -1,0 +1,4 @@
+flex algebra.l
+bison -dy algebra.y
+gcc lex.yy.c y.tab.c -o algebra.exe
+algebra.exe

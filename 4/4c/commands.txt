@@ -1,0 +1,4 @@
+bison -dy exp4c.y
+flex exp4c.l
+gcc y.tab.c lex.yy.c -o exp4c
+exp4c.exe
