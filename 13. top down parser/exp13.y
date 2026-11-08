@@ -1,6 +1,9 @@
 
 %{
 #include <stdio.h>
+
+int yylex(void);
+int yyerror(const char *msg);
 %}
 
 %token A B
@@ -21,7 +24,7 @@ int main()
     return 0;
 }
 
-int yyerror(char *msg)
+int yyerror(const char *msg)
 {
     printf("Syntax error: %s\n", msg);
     return 0;

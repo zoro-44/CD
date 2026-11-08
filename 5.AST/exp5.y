@@ -1,20 +1,23 @@
 
+%code requires {
+typedef struct ast AST;
+}
+
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include "exp5.tab.h"
 
-typedef struct ast {
+struct ast {
     char nodetype;
-    struct ast *left;
-    struct ast *right;
+    struct ast *left, *right;
     int value;
-} AST;
+};
 
-AST *new_node(char nodetype, AST *left,
-              AST *right, int value);
-void print_ast(AST *node);
+AST *new_node(char, AST *, AST *, int);
+void print_ast(AST *);
+void yyerror(const char *);
 int yylex(void);
-void yyerror(const char *msg);
 %}
 
 %union {
@@ -37,50 +40,29 @@ input:
     ;
 
 expr:
-      expr '+' term {
-          $$ = new_node('+', $1, $3, 0);
-      }
-    | expr '-' term {
-          $$ = new_node('-', $1, $3, 0);
-      }
-    | term {
-          $$ = $1;
-      }
+      expr '+' term { $$ = new_node('+', $1, $3, 0); }
+    | expr '-' term { $$ = new_node('-', $1, $3, 0); }
+    | term           { $$ = $1; }
     ;
 
 term:
-      term '*' factor {
-          $$ = new_node('*', $1, $3, 0);
-      }
-    | term '/' factor {
-          $$ = new_node('/', $1, $3, 0);
-      }
-    | factor {
-          $$ = $1;
-      }
+      term '*' factor { $$ = new_node('*', $1, $3, 0); }
+    | term '/' factor { $$ = new_node('/', $1, $3, 0); }
+    | factor           { $$ = $1; }
     ;
 
 factor:
-      '(' expr ')' {
-          $$ = $2;
-      }
-    | NUMBER {
-          $$ = new_node('N', NULL, NULL, $1);
-      }
+      '(' expr ')' { $$ = $2; }
+    | NUMBER       { $$ = new_node('N', NULL, NULL, $1); }
     ;
 %%
 
-AST *new_node(char nodetype, AST *left,
-              AST *right, int value)
+AST *new_node(char type, AST *left, AST *right, int value)
 {
     AST *node = malloc(sizeof(AST));
+    if (!node) exit(1);
 
-    if (node == NULL) {
-        printf("Memory allocation failed\n");
-        exit(1);
-    }
-
-    node->nodetype = nodetype;
+    node->nodetype = type;
     node->left = left;
     node->right = right;
     node->value = value;
@@ -90,12 +72,11 @@ AST *new_node(char nodetype, AST *left,
 
 void print_ast(AST *node)
 {
-    if (node == NULL)
-        return;
+    if (!node) return;
 
-    if (node->nodetype == 'N') {
+    if (node->nodetype == 'N')
         printf("%d", node->value);
-    } else {
+    else {
         printf("(");
         print_ast(node->left);
         printf(" %c ", node->nodetype);
